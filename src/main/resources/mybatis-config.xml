@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true" />
+    </settings>
+    
+    <typeAliases>
+        <package name="com.be.member.dto.res"/>
+        <package name="com.be.member.domain"/>
+    </typeAliases>
+    
+
+    <mappers>
+        <mapper resource="mapper/productMapper.xml"/>
+        <mapper resource="mapper/SavingProductMapper.xml"/>
+        <mapper resource="mapper/FundProductMapper.xml"/>
+        <mapper resource="mapper/BondProductMapper.xml"/>
+        <mapper resource="mapper/StockMapper.xml"/>
+        <mapper resource="mapper/PortfolioMapper.xml"/>
+        <mapper resource="mapper/CartMapper.xml"/>
+        <mapper resource="mapper/MemberMapper.xml"/>
+    </mappers>
+
+</configuration>

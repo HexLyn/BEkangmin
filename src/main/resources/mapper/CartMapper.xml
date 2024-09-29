@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- MyBatis 매퍼 설정 파일 -->
+<mapper namespace="com.be.cart.mapper.CartMapper">
+    <resultMap id="cartItemMap" type="com.be.cart.domain.CartItemVO">
+        <id column="cartID" property="cartId"/>
+        <result column="productID" property="productId"/>
+        <result column="userNum" property="userNum"/>
+    </resultMap>
+
+    <select id="getCartItemList" resultType="com.be.cart.domain.CartItemVO">
+        select c.cartID, c.productID, c.userNum from cartitem c
+        where userNum = #{userNum}
+    </select>
+    <select id="checkCartItem" resultType="com.be.cart.domain.CartItemVO">
+        select * from cartitem
+        where productID = #{productId} and userNum = #{userNum}
+    </select>
+    <insert id="addCartItem">
+        insert into cartitem (productID, userNum, productType, provider, productName, expectedReturn, interestRate)
+        values (#{productId}, #{userNum}, #{productType}, #{provider}, #{productName}, #{expectedReturn}, #{interestRate})
+
+        <selectKey resultType="Int" keyProperty="cartId" keyColumn="cartID" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+    <delete id="deleteCartItem">
+        delete from cartitem
+        where cartID = #{cartId}
+    </delete>
+</mapper>

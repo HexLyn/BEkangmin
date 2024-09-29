@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- MyBatis 매퍼 설정 파일 -->
+<mapper namespace="com.be.portfolio.mapper.PortfolioMapper">
+
+    <resultMap id="portfolioMap" type="com.be.portfolio.domain.PortfolioVO">
+        <id column="portfolioID" property="portfolioId"/>
+        <result column="creationDate" property="creationDate"/>
+        <result column="total" property="total"/>
+        <result column="expectedReturn" property="expectedReturn"/>
+        <result column="riskLevel" property="riskLevel"/>
+        <result column="portfolioName" property="portfolioName"/>
+        <result column="userNum" property="userNum"/>
+        <collection property="portfolioItems" resultMap="portfolioItemMap"/>
+    </resultMap>
+
+    <resultMap id="portfolioItemMap" type="com.be.portfolio.domain.PortfolioItemVO">
+        <id column="portfolioItemID" property="portfolioItemId"/>
+        <result column="portfolioID" property="portfolioId"/>
+        <result column="productID" property="productId"/>
+        <result column="stockCode" property="stockCode"/>
+        <result column="amount" property="amount"/>
+        <result column="expectedReturn" property="expectedReturn"/>
+    </resultMap>
+
+    <select id="getPortfolioItemList" resultType="com.be.portfolio.domain.PortfolioItemVO">
+        select pi.portfolioitemID, pi.portfolioID, pi.productID, pi.stockCode, pi.amount, pi.expectedReturn, p.productType, s.dailyPrice
+        from portfolioitem pi
+            left outer join product p
+                on pi.productID = p.productID
+            left outer join stock s
+                on pi.stockCode = s.stockCode
+        where pi.portfolioID = #{portfolioId}
+    </select>
+    <select id="getPortfolio" resultType="com.be.portfolio.domain.PortfolioVO">
+        select * from portfolio
+        where portfolioID = #{portfolioId}
+    </select>
+    <select id="getAllIds" resultType="java.lang.Integer">
+        select portfolioID from portfolio;
+    </select>
+    <insert id="insertPortfolio">
+        insert into portfolio(creationDate, total, expectedReturn, riskLevel, portfolioName, userNum)
+        values(#{creationDate}, #{total}, #{expectedReturn}, #{riskLevel}, #{portfolioName}, #{userNum})
+        <selectKey resultType="Int" keyProperty="portfolioId" keyColumn="portfolioID" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+    <insert id="insertPortfolioItem">
+        insert into portfolioitem(portfolioID, productID, stockCode, amount, expectedReturn)
+        values(#{portfolioId}, #{productId}, #{stockCode}, #{amount}, #{expectedReturn})
+    </insert>
+    <update id="updatePortfolio">
+        update portfolio set total=#{total}, expectedReturn=#{expectedReturn}, riskLevel=#{riskLevel} where portfolioID=#{portfolioId}
+    </update>
+    <delete id="deletePortfolio">
+        delete from portfolio
+        where portfolioID = #{portfolioId}
+    </delete>
+    <delete id="deletePortfolioItem">
+        delete from portfolioItem
+        where portfolioID = #{portfolioId}
+    </delete>
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.be.stock.mapper.StockMapper">
+
+    <!-- Insert statement for inserting a StockVO object into the stock table -->
+    <insert id="insert" parameterType="com.be.stock.domain.StockVO">
+        INSERT INTO stock (
+            stockCode, stockName, dailyPrice, field,
+            mrktCtg, clpr, vs, fltRt, mkp,
+            hipr, lopr, trqu, trPrc, istgStCnt, mrktTotAmt
+        )
+        VALUES (
+                     #{stockCode}, #{stockName}, #{dailyPrice}, #{field},
+                     #{mrktCtg}, #{clpr}, #{vs}, #{fltRt}, #{mkp},
+                     #{hipr}, #{lopr}, #{trqu}, #{trPrc}, #{istgStCnt}, #{mrktTotAmt}
+                 )
+            ON DUPLICATE KEY UPDATE
+                  stockName = VALUES(stockName),
+                  dailyPrice = VALUES(dailyPrice),
+                  field = VALUES(field),
+                  mrktCtg = VALUES(mrktCtg),
+                  clpr = VALUES(clpr),
+                  vs = VALUES(vs),
+                  fltRt = VALUES(fltRt),
+                  mkp = VALUES(mkp),
+                  hipr = VALUES(hipr),
+                  lopr = VALUES(lopr),
+                  trqu = VALUES(trqu),
+                  trPrc = VALUES(trPrc),
+                  istgStCnt = VALUES(istgStCnt),
+                  mrktTotAmt = VALUES(mrktTotAmt);
+    </insert>
+
+    <!-- stockCode 또는 stockName으로 검색하는 쿼리 -->
+    <select id="searchStock" parameterType="String" resultType="com.be.stock.domain.StockVO">
+        SELECT *
+        FROM stock
+        WHERE stockCode LIKE CONCAT('%', #{searchTerm}, '%')
+           OR stockName LIKE CONCAT('%', #{searchTerm}, '%')
+    </select>
+
+    <!-- 전체 주식 데이터를 조회하는 쿼리 -->
+    <select id="findAll" resultType="com.be.stock.domain.StockVO">
+        SELECT *
+        FROM stock <!-- 실제 테이블 이름으로 대체하세요 -->
+    </select>
+
+
+
+</mapper>

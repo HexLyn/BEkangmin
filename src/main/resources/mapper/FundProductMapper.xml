@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.be.finance.mapper.FundProductMapper">
+
+    <!-- 펀드 상품 삽입 -->
+    <insert id="insertFundProduct" parameterType="com.be.finance.domain.FundProductVO">
+        INSERT INTO FundProduct (productID, company_nm, product_nm, yield_1, yield_3, yield_6, yield_12,
+                                 RiskLevel, fund_type, advanced_fee, total_payoff_rate, hit)
+        VALUES (#{productId}, #{companyNm}, #{productNm}, #{yield1}, #{yield3}, #{yield6}, #{yield12},
+                #{riskLevel}, #{fundType}, #{advancedFee}, #{totalPayoffRate}, #{hit})
+    </insert>
+
+    <!-- 펀드 상품 조회 -->
+    <select id="getFundProductsList" resultType="com.be.finance.domain.FundProductVO">
+        SELECT * FROM FundProduct
+    </select>
+
+    <!-- 검색어 기반펀드 상품 조회 -->
+    <select id="searchFundProducts" resultType="com.be.finance.domain.FundProductVO">
+        SELECT *
+        FROM FundProduct
+        WHERE product_nm LIKE #{keyword}
+    </select>
+</mapper>

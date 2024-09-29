@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.be.finance.mapper.SavingProductMapper">
+
+    <!-- SavingProduct 테이블에 데이터 삽입 -->
+    <insert id="insertSavingProduct" parameterType="com.be.finance.domain.SavingProductVO">
+        INSERT INTO SavingsProduct (
+            ProductID, dcls_month, fin_co_no, kor_co_nm, fin_prdt_nm,
+            join_way, mtrt_int, spcl_cnd, join_deny, join_member, etc_note,
+            max_limit, dcls_strt_day, dcls_end_day, RiskLevel, hit, fin_prdt_cd
+        ) VALUES (
+                     #{productId}, #{dclsMonth}, #{finCoNo}, #{korCoNm}, #{finPrdtNm},
+                     #{joinWay}, #{mtrtInt}, #{spclCnd}, #{joinDeny}, #{joinMember},
+                     #{etcNote}, #{maxLimit}, #{dclsStrtDay}, #{dclsEndDay},
+                     1, 0, #{finPrdtCd}
+                 );
+    </insert>
+
+    <!-- SavingProductRates 테이블에 데이터 삽입 -->
+    <insert id="insertSavingProductRate" parameterType="com.be.finance.domain.SavingProductRatesVO">
+        INSERT INTO SavingProductRates (
+            ProductID, save_trm, intr_rate_type, intr_rate_type_nm,
+            intr_rate, intr_rate2, rsrv_type, rsrv_type_nm
+        ) VALUES (
+                     #{productId}, #{saveTrm}, #{intrRateType}, #{intrRateTypeNm},
+                     #{intrRate}, #{intrRate2}, #{rsrvType}, #{rsrvTypeNm}
+                 );
+    </insert>
+
+
+    <!-- 전체 예금 상품 조회 -->
+    <select id="getDepositProducts" resultType="com.be.finance.domain.SavingProductVO">
+        SELECT *
+        FROM SavingsProduct
+        WHERE fin_prdt_nm LIKE '%예금%';
+    </select>
+
+    <!-- 전체 적금 상품 조회 -->
+    <select id="getSavingProducts" resultType="com.be.finance.domain.SavingProductVO">
+        SELECT *
+        FROM SavingsProduct
+        WHERE fin_prdt_nm LIKE '%적금%';
+    </select>
+
+    <!-- 예금 상품 금리 정보 조회 (rsrv_type IS NULL) -->
+    <select id="getDepositRates" resultType="com.be.finance.domain.SavingProductRatesVO">
+        SELECT *
+        FROM SavingProductRates
+        WHERE rsrv_type LIKE "NULL";
+    </select>
+
+    <!-- 적금 상품 금리 정보 조회 (rsrv_type IS NOT NULL) -->
+    <select id="getSavingRates" resultType="com.be.finance.domain.SavingProductRatesVO">
+        SELECT *
+        FROM SavingProductRates
+        WHERE rsrv_type NOT LIKE "NULL";
+    </select>
+
+    <!-- 예금 상품 검색 -->
+    <select id="searchDepositProducts" resultType="com.be.finance.domain.SavingProductVO">
+        SELECT *
+        FROM SavingsProduct
+        WHERE fin_prdt_nm LIKE #{keyword};
+    </select>
+
+    <!-- 검색된 예금 상품 기간별 수익률 조회 -->
+    <select id="searchDepositRatesProducts" resultType="com.be.finance.domain.SavingProductRatesVO">
+        SELECT *
+        FROM SavingProductRates
+        WHERE productID IN (SELECT productID
+                            FROM SavingsProduct
+                            WHERE fin_prdt_nm LIKE #{keyword});
+    </select>
+
+    <!-- 적금 상품 검색 -->
+    <select id="searchSavingProducts" resultType="com.be.finance.domain.SavingProductVO">
+        SELECT *
+        FROM SavingsProduct
+        WHERE fin_prdt_nm LIKE #{keyword};
+    </select>
+
+    <!-- 검색된 적금 상품 기간별 수익률 조회 -->
+    <select id="searchSavingRatesProducts" resultType="com.be.finance.domain.SavingProductRatesVO">
+        SELECT *
+        FROM SavingProductRates
+        WHERE productID IN (SELECT productID
+                            FROM SavingsProduct
+                            WHERE fin_prdt_nm LIKE #{keyword});
+    </select>
+
+
+</mapper>

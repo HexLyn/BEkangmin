@@ -34,25 +34,35 @@ public class SavingProductController {
 
     // 예금 리스트 조회 API
     @GetMapping("/deposit")
-    public Map<String, Object> getDepositProducts() {
-        return savingProductService.getDepositProducts();
+    public Map<String, Object> getDepositProducts(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return savingProductService.getDepositProducts(page, pageSize);
     }
 
     // 적금 리스트 조회 API
     @GetMapping("/saving")
-    public Map<String, Object> getSavingProducts() {
-        return savingProductService.getSavingProducts();
+    public Map<String, Object> getSavingProducts(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return savingProductService.getSavingProducts(page, pageSize);
     }
 
     // 예금 상품 검색
     @GetMapping("/depositSearch")
-    public Map<String, Object> searchDepositProducts(@RequestParam String keyword) {
-        return savingProductService.searchDepositProducts(keyword);
+    public Map<String, Object> searchDepositProducts(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return savingProductService.searchDepositProducts(keyword, page, pageSize);
     }
 
     // 적금 상품 검색
     @GetMapping("/savingSearch")
-    public Map<String, Object> searchSavingProducts(@RequestParam String keyword) {
-        return savingProductService.searchSavingProducts(keyword);
+    public Map<String, Object> searchSavingProducts(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return savingProductService.searchSavingProducts(keyword, page, pageSize);
     }
 }

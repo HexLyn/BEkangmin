@@ -10,6 +10,8 @@ import com.be.exception.CustomException;
 import com.be.member.domain.Member;
 import com.be.member.domain.type.Role;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,6 +31,7 @@ import static com.be.common.code.ErrorCode.*;
 @RequiredArgsConstructor
 public class JwtProvider {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtProvider.class);
     @Value("${api.jwt.secret}")
     private String secret;
 
@@ -110,7 +113,7 @@ public class JwtProvider {
      * JWT user Access 인가
      */
     public Member authorizeUserAccessJwt(String token) {
-        return authorizeJwt(token, Role.ADMIN, Jwt.ACCESS);
+        return authorizeJwt(token, Role.MEMBER, Jwt.ACCESS);
     }
 
     /**
@@ -159,14 +162,16 @@ public class JwtProvider {
                 .toLocalDateTime()
                 .isBefore(LocalDateTime.now());
 
+        log.info(roles.toString());
         // Active member validation
         Member member;
         if (memberNum == 0L && roles.contains(Role.GUEST.name()))
             member = null;
 //        else if (memberNum > 0L && roles.contains(Role.ADMIN.name()))
 //            member = customuserDetailsService.loadAdminByUserId(memberNum);
-        else if (memberNum > 0L && roles.contains(Role.MEMBER.name()))
-            member = customuserDetailsService.loadUserByMemberNum(memberNum);
+        else if (memberNum > 0L && roles.contains(Role.MEMBER.name())){
+
+            member = customuserDetailsService.loadUserByMemberNum(memberNum);}
         else
             throw new CustomException(TOKEN_UNAUTHENTICATED);
 
@@ -181,6 +186,7 @@ public class JwtProvider {
         } catch (JWTVerificationException e) {
             throw new CustomException(e, TOKEN_UNAUTHENTICATED);
         }
+        log.info("여기 통과하나 체크");
 
         return member;
     }
@@ -192,8 +198,10 @@ public class JwtProvider {
      */
     private Member authorizeJwt(String token, Role role, Jwt jwt) {
         DecodedJWT decodedJWT = jwtDecoder(token);
+        log.info("여기도 통과하나 체크");
         Member member = authenticateJwt(token);
 
+        log.info("authenticate 끝나고 authorizeJwt");
         Set<String> roles = new HashSet<>(decodedJWT.getClaim("roles").asList(String.class));
         Long validTime = decodedJWT.getExpiresAt().getTime() - decodedJWT.getIssuedAt().getTime();
 
@@ -236,6 +244,7 @@ public class JwtProvider {
         try {
             return verifier.verify(token);
         } catch (JWTVerificationException e) {
+            log.info("여기서 터지나 체크");
             throw new CustomException(e, TOKEN_UNAUTHENTICATED);
         }
     }

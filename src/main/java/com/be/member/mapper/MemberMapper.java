@@ -15,4 +15,6 @@ public interface MemberMapper {
 
     Member findOneByMemberNum(long memberNum);
 
+    int updatePassword(Member member);
+
 }

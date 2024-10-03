@@ -16,4 +16,7 @@ public interface FundProductMapper {
 
     // 펀드 검색 리스트 조회
     List<FundProductVO> searchFundProducts(@Param("keyword") String keyword);
+
+    // 특정 채권 상품 상세 정보 조회
+    FundProductVO getFundProductDetail(int productId);
 }

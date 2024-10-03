@@ -9,12 +9,16 @@ import com.be.portfolio.dto.res.PortfolioPortionDto;
 import com.be.portfolio.dto.res.PortfolioResDto;
 import com.be.portfolio.mapper.PortfolioMapper;
 import lombok.extern.log4j.Log4j;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 
 @ExtendWith(SpringExtension.class)
@@ -26,6 +30,8 @@ public class PortfolioServiceImplTest {
 
     @Autowired
     PortfolioMapper portfolioMapper;
+
+
 
     @Test
     public void testGetPortfolio() {
@@ -49,7 +55,7 @@ public class PortfolioServiceImplTest {
         Date now = new Date();
         reqDto.setCreationDate(now);
         reqDto.setPortfolioName("asdf");
-        reqDto.setUserNum(1);
+        reqDto.setMemberNum(1);
         reqDto.setRiskLevel(21);
         reqDto.setExpectedReturn(123);
         reqDto.setTotal(10000);
@@ -98,6 +104,30 @@ public class PortfolioServiceImplTest {
     @Test
     void calculatePortfolio() {
 
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("005930", new int[]{79600,77000,76600,76600,76500,74700,73600,73200,73100,73900,72600,71000,71700,74700,75100,75200,74000});
+
+            //            String strJson = "{\"005930\":[79600,77000,76600,76600,76500,74700,73600,73200,73100,73900,72600,71000,71700,74700,75100,75200,74000]}";
+
+            ProcessBuilder processBuilder = new ProcessBuilder("python", "src/main/java/com/be/portfolio/service/test.py", jsonObject.toString());
+            Process process = processBuilder.start();
+
+            InputStream inputStream = process.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            while((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+
+            // 파이썬 플라스크 서버 연결 + 계산 + 반환
+            // portfolio의 expectedReturn, riskLevel, portfolioItem의 expectedReturn 반환
+
+            //
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test

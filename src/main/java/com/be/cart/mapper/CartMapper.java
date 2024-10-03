@@ -6,8 +6,8 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface CartMapper {
-    List<CartItemVO> getCartItemList(int userNum);
-    CartItemVO checkCartItem(@Param("userNum") int userNum, @Param("productId") int productId);
+    List<CartItemVO> getCartItemList(long memberNum);
+    CartItemVO checkCartItem(@Param("memberNum") long memberNum, @Param("productId") int productId);
     int addCartItem(CartItemVO cartVO);
     void deleteCartItem(int cartId);
 }

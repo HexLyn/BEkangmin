@@ -18,12 +18,15 @@ public enum SuccessCode {
     // 200 OK
     USERNAME_AVAILABLE(OK, "아이디 중복 확인을 했습니다."),
     EMAIL_AVAILABLE(OK, "이메일 중복 확인을 했습니다."),
+    SELF_USER_FOUND(OK, "본인을 조회 했습니다."),
+    USER_LOGOUT(OK, "회원이 로그아웃 했습니다."),
+    USER_LOGIN(OK, "회원이 로그인 했습니다."),
+    PASSWORD_UPDATED(OK, "비밀번호를 업데이트 했습니다."),
 
     //201
-    USER_REGISTERED(CREATED, "회원 가입을 했습니다."),
+    USER_REGISTERED(CREATED, "회원 가입을 했습니다.");
 
 
-    MEMBER_LOGIN(OK, "회원이 로그인했습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

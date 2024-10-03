@@ -1,7 +1,6 @@
 package com.be.portfolio.dto.res;
 
 import com.be.portfolio.domain.PortfolioVO;
-import com.be.portfolio.dto.req.PortfolioReqDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,24 +16,25 @@ import java.util.List;
 @Builder
 public class PortfolioResDto {
     private int portfolioId;
+    private String portfolioName;
     private Date creationDate;
     private int total;
     private int expectedReturn;
     private int riskLevel;
-    private String portfolioName;
-    private int userNum;
+    private int memberNum;
 
-    private List<PortfolioItemResDto> portfolioItems = new ArrayList<>();
+    private List<PortfolioItemResDto> portfolioItems;
     private PortfolioPortionDto portion;
 
     public static PortfolioResDto of(PortfolioVO vo) {
         return vo == null ? null : PortfolioResDto.builder()
+                .portfolioId(vo.getPortfolioId())
                 .creationDate(vo.getCreationDate())
                 .total(vo.getTotal())
                 .expectedReturn(vo.getExpectedReturn())
                 .riskLevel(vo.getRiskLevel())
                 .portfolioName(vo.getPortfolioName())
-                .userNum(vo.getUserNum())
+                .memberNum(vo.getMemberNum())
                 .build();
     }
 
@@ -45,7 +45,7 @@ public class PortfolioResDto {
                 .expectedReturn(expectedReturn)
                 .riskLevel(riskLevel)
                 .portfolioName(portfolioName)
-                .userNum(userNum)
+                .memberNum(memberNum)
                 .build();
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -22,6 +23,9 @@ public class BondProductService {
 
     @Autowired
     private BondProductMapper bondProductMapper;
+
+    @Autowired
+    private PaginationService paginationService;
 
     @Autowired
     private ProductMapper productMapper;
@@ -40,45 +44,50 @@ public class BondProductService {
             .build();
 
     public void fetchAndSaveBondProducts() {
-        // 요청 URL
-        String url = bondProductApiUrl + "?serviceKey=" + bondAuthKey + "&numOfRows=30&pageNo=3&resultType=json";
-        System.out.println(url);
+        int totalPages = 10; // 총 10페이지
+        int numOfRows = 30; // 1페이지당 30개의 데이터
 
-        // OkHttp 요청 구성
-        Request request = new Request.Builder()
-                .url(url)
-                .get() // GET 요청
-                .addHeader("Cookie", "SCOUTER=x7nhrjlt939t2f")
-                .build();
+        for (int pageNo = 1; pageNo <= totalPages; pageNo++) {
+            // 요청 URL
+            String url = bondProductApiUrl + "?serviceKey=" + bondAuthKey + "&numOfRows=" + numOfRows + "&pageNo=" + pageNo + "&resultType=json";
+            System.out.println("Fetching page: " + pageNo + "form URL: " + url);
 
-        try {
-            // OkHttp 요청 실행
-            Response response = client.newCall(request).execute();
+            // OkHttp 요청 구성
+            Request request = new Request.Builder()
+                    .url(url)
+                    .get() // GET 요청
+                    .addHeader("Cookie", "SCOUTER=x7nhrjlt939t2f")
+                    .build();
 
-            if (!response.isSuccessful() || response.body() == null) {
-                throw new RuntimeException("API 호출 실패 : 상태 코드 : " + response.code());
+            try {
+                // OkHttp 요청 실행
+                Response response = client.newCall(request).execute();
+
+                if (!response.isSuccessful() || response.body() == null) {
+                    throw new RuntimeException("API 호출 실패 : 상태 코드 : " + response.code());
+                }
+
+                // 응답 내용 확인
+                String responseJson = response.body().string();
+                System.out.println("API 응답 데이터 : " + responseJson);
+
+                // 응답 예외 처리
+                if (responseJson == null || responseJson.isEmpty()) {
+                    throw new RuntimeException("API 응답이 없습니다.");
+                }
+
+                // JSON 파싱
+                JSONObject jsonResponse = new JSONObject(responseJson);  // JSON 변환 시도
+                JSONObject responseObj = jsonResponse.getJSONObject("response");
+                JSONObject body = responseObj.getJSONObject("body");
+                JSONArray items = body.getJSONObject("items").getJSONArray("item");
+
+                // DB 저장 메소드 호출
+                processBondItems(items);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("API 호출 중 오류 발생 : " + e.getMessage());
             }
-
-            // 응답 내용 확인
-            String responseJson = response.body().string();
-            System.out.println("API 응답 데이터 : " + responseJson);
-
-            // 응답 예외 처리
-            if (responseJson == null || responseJson.isEmpty()) {
-                throw new RuntimeException("API 응답이 없습니다.");
-            }
-
-            // JSON 파싱
-            JSONObject jsonResponse = new JSONObject(responseJson);  // JSON 변환 시도
-            JSONObject responseObj = jsonResponse.getJSONObject("response");
-            JSONObject body = responseObj.getJSONObject("body");
-            JSONArray items = body.getJSONObject("items").getJSONArray("item");
-
-            // DB 저장 메소드 호출
-            processBondItems(items);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("API 호출 중 오류 발생 : " + e.getMessage());
         }
     }
 
@@ -139,14 +148,21 @@ public class BondProductService {
     }
 
     // 전체 채권 리스트 조회
-    public List<BondProductVO> getBondProductsList() {
-        return bondProductMapper.getBondProductsList();
+    public Map<String, Object> getBondProductsList(int page, int pageSize) {
+        List<BondProductVO> bondproducts = bondProductMapper.getBondProductsList();
+        return paginationService.paginate(bondproducts, page, pageSize);
     }
 
     // 채권 상품 검색
-    public List<BondProductVO> searchBondProducts(String keyword) {
+    public Map<String, Object> searchBondProducts(String keyword, int page, int pageSize) {
         // 검색어가 포함된 상품명 검색
         String searchKeyword = "%" + keyword + "%";
-        return bondProductMapper.searchBondProducts(searchKeyword);
+        List<BondProductVO> bondProducts = bondProductMapper.searchBondProducts(searchKeyword);
+        return paginationService.paginate(bondProducts, page, pageSize);
+    }
+
+    // 특정 채권 상품 상세 정보 조회
+    public BondProductVO getBondProductDetail(int productId) {
+        return bondProductMapper.getBondProductDetail(productId);
     }
 }

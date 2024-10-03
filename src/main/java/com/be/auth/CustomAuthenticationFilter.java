@@ -25,7 +25,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         String token = request.getHeader("Refresh-Token") == null ?
                 request.getHeader(AUTHORIZATION) : request.getHeader("Refresh-Token");
 
-        if (token != null && token.startsWith("Bearer ")) {
+        if (token != null && token.startsWith("Bearer")) {
             try {
                 jwtProvider.authenticateJwt(token);
             } catch (Exception e) {

@@ -8,20 +8,24 @@
     <resultMap id="cartItemMap" type="com.be.cart.domain.CartItemVO">
         <id column="cartID" property="cartId"/>
         <result column="productID" property="productId"/>
-        <result column="userNum" property="userNum"/>
+        <result column="memberNum" property="memberNum"/>
     </resultMap>
 
     <select id="getCartItemList" resultType="com.be.cart.domain.CartItemVO">
-        select c.cartID, c.productID, c.userNum from cartitem c
-        where userNum = #{userNum}
+        select * from cartitem
+        where memberNum = #{memberNum}
+    </select>
+    <select id="getFundInCart" resultType="com.be.cart.domain.CartItemVO">
+        select c.cartID, c.productID, c.memberNum, p.productType,   from cartitem c
+        where memberNum = #{memberNum}
     </select>
     <select id="checkCartItem" resultType="com.be.cart.domain.CartItemVO">
         select * from cartitem
-        where productID = #{productId} and userNum = #{userNum}
+        where productID = #{productId} and memberNum = #{memberNum}
     </select>
     <insert id="addCartItem">
-        insert into cartitem (productID, userNum, productType, provider, productName, expectedReturn, interestRate)
-        values (#{productId}, #{userNum}, #{productType}, #{provider}, #{productName}, #{expectedReturn}, #{interestRate})
+        insert into cartitem (productID, memberNum, productType, provider, productName, expectedReturn, interestRate)
+        values (#{productId}, #{memberNum}, #{productType}, #{provider}, #{productName}, #{expectedReturn}, #{interestRate})
 
         <selectKey resultType="Int" keyProperty="cartId" keyColumn="cartID" order="AFTER">
             SELECT LAST_INSERT_ID()

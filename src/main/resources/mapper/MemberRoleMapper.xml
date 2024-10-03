@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.be.member.mapper.MemberRoleMapper">
+
+    <insert id="save" parameterType="memberRole">
+        insert into member_role(role, member_num)
+        values (#{role}, #{memberID});
+    </insert>
+
+    <select id="findMemberRoleByMemberNum" parameterType="long" resultType="memberRole">
+        select * from member_role where member_num = #{memberNum};
+    </select>
+</mapper>

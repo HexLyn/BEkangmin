@@ -27,11 +27,12 @@ import javax.sql.DataSource;
         "com.be.portfolio.mapper",
         "com.be.finance.mapper",
         "com.be.cart.mapper",
+        "com.be.cart.mapper",
         "com.be.member.mapper"
 })
 @ComponentScan(basePackages = {
         "com.be.portfolio.service",
-        "com.be.cart.service"
+        "com.be.cart.service",
 })
 @Slf4j
 @EnableTransactionManagement

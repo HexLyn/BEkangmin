@@ -7,7 +7,6 @@ import java.util.List;
 @Data
 public class CartList {
     private List<CartItemVO> cartItems;
-    private int userNum;
+    private Long memberNum;
     private int totalCount;
-
 }

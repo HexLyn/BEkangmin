@@ -34,6 +34,13 @@
     <select id="searchBondProducts" resultType="com.be.finance.domain.BondProductVO">
         SELECT *
         FROM BondProduct
-        WHERE isisCdNm LIKE #{keyword}
+        WHERE isinCdNm LIKE #{keyword}
+    </select>
+
+    <!-- 특정 채권 상품 상세 정보 조회 -->
+    <select id="getBondProductDetail" resultType="com.be.finance.domain.BondProductVO">
+        SELECT *
+        FROM BondProduct
+        WHERE productId = #{productId}
     </select>
 </mapper>

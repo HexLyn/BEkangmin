@@ -19,12 +19,16 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class SavingProductService {
 
     @Autowired
     private SavingProductMapper savingProductMapper;
+
+    @Autowired
+    private PaginationService paginationService;
 
     @Autowired
     private ProductMapper productMapper;
@@ -192,64 +196,121 @@ public class SavingProductService {
     }
 
     // 예금 리스트
-    public Map<String, Object> getDepositProducts() {
+    public Map<String, Object> getDepositProducts(int page, int pageSize) {
         // 예금 상품 조회
         List<SavingProductVO> depositProducts = savingProductMapper.getDepositProducts();
 
+        Map<String, Object> paginatedProducts = paginationService.paginate(depositProducts, page, pageSize);
+
+
+        // 3. 페이징된 상품 목록에서 상품 ID 리스트 추출
+        List<SavingProductVO> paginatedProductList = (List<SavingProductVO>) paginatedProducts.get("items");
+        List<Integer> productIds = paginatedProductList.stream()
+                .map(SavingProductVO::getProductId)
+                .collect(Collectors.toList());
+
         // 예금 상품 기간별 금리 조회
-        List<SavingProductRatesVO> depositRates = savingProductMapper.getDepositRates();
+        List<SavingProductRatesVO> depositRates = savingProductMapper.getDepositRatesByProductIds(productIds);
 
         // 결과를 담을 Map 생성
         Map<String, Object> result = new HashMap<>();
-        result.put("products", depositProducts);
+        result.put("products", paginatedProductList);
         result.put("rates", depositRates);
+        result.put("currentPage", paginatedProducts.get("currentPage"));
+        result.put("totalPages", paginatedProducts.get("totalPages"));
+        result.put("totalItems",paginatedProducts.get("totalItems"));
         return result;
     }
 
     // 예금 상품 검색
-    public Map<String, Object> searchDepositProducts(String keyword) {
+    public Map<String, Object> searchDepositProducts(String keyword, int page, int pageSize) {
         String searchKeyword = "%" + keyword + "%";
 
-        // 검색어가 포함된 예금 상품 조회
+        // 1. 검색어가 포함된 예금 상품 조회
         List<SavingProductVO> depositProducts = savingProductMapper.searchDepositProducts(searchKeyword);
 
-        // 검색어가 포함된 예금 상품의 기간별 금리 조회
-        List<SavingProductRatesVO> depositRates = savingProductMapper.searchDepositRatesProducts(searchKeyword);
+        // 2. 페이징 처리
+        Map<String, Object> paginatedProducts = paginationService.paginate(depositProducts, page, pageSize);
 
+        // 3. 페이징된 상품 리스트 추출
+        List<SavingProductVO> paginatedProductList = (List<SavingProductVO>) paginatedProducts.get("items");
+
+        // 4. 페이징된 상품의 productId 리스트 추출
+        List<Integer> productIds = paginatedProductList.stream()
+                .map(SavingProductVO::getProductId)
+                .collect(Collectors.toList());
+
+        // 5. 해당 상품의 기간별 금리 조회
+        List<SavingProductRatesVO> depositRates = savingProductMapper.searchDepositRatesByProductIds(productIds);
+
+        // 6. 결과를 담을 Map 생성
         Map<String, Object> result = new HashMap<>();
-        result.put("depositProducts", depositProducts);
-        result.put("depositRates", depositRates);
+        result.put("products", paginatedProductList); // 페이징된 예금 상품 리스트
+        result.put("rates", depositRates);            // 해당 상품의 기간별 금리 리스트
+        result.put("currentPage", paginatedProducts.get("currentPage"));
+        result.put("totalPages", paginatedProducts.get("totalPages"));
+        result.put("totalItems", paginatedProducts.get("totalItems"));
+
         return result;
     }
 
-
     // 전체 적금 리스트
-    public Map<String, Object> getSavingProducts() {
+    public Map<String, Object> getSavingProducts(int page, int pageSize) {
         // 적금 상품 조회
         List<SavingProductVO> savingProducts = savingProductMapper.getSavingProducts();
-        // 적금 상품 기간별 금리 조회
-        List<SavingProductRatesVO> savingRates = savingProductMapper.getSavingRates();
 
-        // 결과를 담을 Map 생성
+        Map<String, Object> paginatedProducts = paginationService.paginate(savingProducts, page, pageSize);
+
+        List<SavingProductVO> paginatedProductList = (List<SavingProductVO>) paginatedProducts.get("items");
+
+        // 3. 페이징된 적금 상품 ID 리스트 추출
+        List<Integer> productIds = paginatedProductList.stream()
+                .map(SavingProductVO::getProductId)
+                .collect(Collectors.toList());
+
+        // 4. 해당 상품 ID에 맞는 기간별 금리 조회
+        List<SavingProductRatesVO> savingRates = savingProductMapper.getSavingRatesByProductIds(productIds);
+
+        // 5. 결과를 담을 Map 생성
         Map<String, Object> result = new HashMap<>();
-        result.put("products", savingProducts);
-        result.put("rates", savingRates);
+        result.put("products", paginatedProductList);   // 페이징된 적금 상품 목록
+        result.put("rates", savingRates);               // 해당 상품의 기간별 금리 목록
+        result.put("currentPage", paginatedProducts.get("currentPage"));
+        result.put("totalPages", paginatedProducts.get("totalPages"));
+        result.put("totalItems", paginatedProducts.get("totalItems"));
+
         return result;
     }
 
     // 적금 상품 검색
-    public Map<String, Object> searchSavingProducts(String keyword) {
+    public Map<String, Object> searchSavingProducts(String keyword, int page, int pageSize) {
         String searchKeyword = "%" + keyword + "%";
 
-        // 검색어가 포함된 적금 상품 조회
+        // 1. 검색어가 포함된 적금 상품 조회
         List<SavingProductVO> savingProducts = savingProductMapper.searchSavingProducts(searchKeyword);
 
-        // 검색어가 포함된 적금 상품의 기간별 금리 조회
-        List<SavingProductRatesVO> savingRates = savingProductMapper.searchSavingRatesProducts(searchKeyword);
+        // 2. 페이징 처리
+        Map<String, Object> paginatedProducts = paginationService.paginate(savingProducts, page, pageSize);
 
+        // 3. 페이징된 상품 리스트 추출
+        List<SavingProductVO> paginatedProductList = (List<SavingProductVO>) paginatedProducts.get("items");
+
+        // 4. 페이징된 상품의 productId 리스트 추출
+        List<Integer> productIds = paginatedProductList.stream()
+                .map(SavingProductVO::getProductId)
+                .collect(Collectors.toList());
+
+        // 5. 해당 상품의 기간별 금리 조회
+        List<SavingProductRatesVO> savingRates = savingProductMapper.searchSavingRatesByProductIds(productIds);
+
+        // 6. 결과를 담을 Map 생성
         Map<String, Object> result = new HashMap<>();
-        result.put("savingProducts", savingProducts);
-        result.put("savingRates", savingRates);
+        result.put("products", paginatedProductList); // 페이징된 적금 상품 리스트
+        result.put("rates", savingRates);             // 해당 상품의 기간별 금리 리스트
+        result.put("currentPage", paginatedProducts.get("currentPage"));
+        result.put("totalPages", paginatedProducts.get("totalPages"));
+        result.put("totalItems", paginatedProducts.get("totalItems"));
+
         return result;
     }
 }

@@ -5,23 +5,21 @@ import com.be.finance.domain.ProductVO;
 import com.be.finance.mapper.FundProductMapper;
 import com.be.finance.mapper.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class FundProductService {
 
-    private static final int PAGE_SIZE = 10; //페이지당 표시할 상품 수
-
     @Autowired
     private ProductMapper productMapper;
+
+    @Autowired
+    private PaginationService paginationService;
 
     @Autowired
     private FundProductMapper fundProductMapper;
@@ -74,14 +72,21 @@ public class FundProductService {
     }
 
     // 펀드 리스트 가져오기
-    public List<FundProductVO> getFundProductsList() {
-        return fundProductMapper.getFundProductsList();  // DB에서 펀드 데이터를 조회하는 로직
+    public Map<String, Object> getFundProductsList(int page, int pageSize) {
+        List<FundProductVO> fundProducts = fundProductMapper.getFundProductsList();
+        return paginationService.paginate(fundProducts, page, pageSize);
     }
 
     // 검색어 기반 펀드 상품 조회
-    public List<FundProductVO> searchFundProducts(String keyword) {
+    public Map<String, Object> searchFundProducts(String keyword, int page, int pageSize) {
         // 검색어가 포함된 상품명 검색
         String searchKeyword = "%" + keyword + "%";
-        return fundProductMapper.searchFundProducts(searchKeyword);
+        List<FundProductVO> fundProducts = fundProductMapper.searchFundProducts(searchKeyword);
+        return paginationService.paginate(fundProducts, page, pageSize);
+    }
+
+    // 특정 펀드 상품 상세 정보 조회
+    public FundProductVO getFundProductDetail(int productId) {
+        return fundProductMapper.getFundProductDetail(productId);
     }
 }

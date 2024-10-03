@@ -11,11 +11,13 @@ import org.json.JSONObject;
 import org.json.XML;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -141,5 +143,77 @@ public class StockService {
             e.printStackTrace();
             System.out.println("API 호출 중 오류 발생: " + e.getMessage());
         }
+    }
+
+    // 포트폴리오 구성 시 주식 수익률 계산에 필요한 데이터 json 객체로 반환
+    public JSONObject getStockData(String stockCode) {
+        LocalDate now = LocalDate.now();
+        LocalDate past = now.minusYears(1);
+
+        int pageNo = 1; // 초기 페이지 번호
+        int numOfRows = 1000; // 한 페이지에 가져올 데이터 수
+        boolean hasNextPage = true; // 다음 페이지가 있는지 여부
+        String beginDate = "" + past.getYear() + past.getMonthValue() + past.getDayOfMonth();
+        String endDate = "" + now.getYear() + now.getMonthValue() + now.getDayOfMonth();
+
+
+        JSONObject json = null;
+        try {
+            while (hasNextPage) {
+                // API 호출 URL
+                String url = StockUrl + "?serviceKey=" + StockKey + "&numOfRows=" + numOfRows + "&pageNo=" + pageNo + "&beginBasDt=" + beginDate + "&endBasDt=" + endDate + "&likeSrtnCd=" + stockCode + "&resultType=xml";
+                System.out.println("API 호출 URL: " + url);
+
+                // OkHttp 요청 구성
+                Request request = new Request.Builder()
+                        .url(url)
+                        .get()
+                        .addHeader("Cookie", "SCOUTER=x3qrmbd76uuavd")
+                        .build();
+
+                // OkHttp 요청 실행
+                Response response = client.newCall(request).execute();
+                String responseBody = response.body().string();
+
+                // 응답이 XML 형식일 경우 XML을 JSON으로 변환
+                json = XML.toJSONObject(responseBody);
+
+                if (responseBody == null) {
+                    throw new RuntimeException("API 응답이 null입니다.");
+                }
+
+                if (json.has("response")) {
+                    JSONObject responseObject = json.getJSONObject("response");
+                    JSONObject body = responseObject.getJSONObject("body");
+                    JSONArray items = body.getJSONObject("items").getJSONArray("item");
+
+                    JSONObject resultJson = new JSONObject();
+                    JSONArray prices = new JSONArray();
+                    for (int i = items.length() - 1; i >= 0; i--) {
+                        JSONObject item = items.getJSONObject(i);
+                        int price = item.optInt("clpr");
+                        prices.put(price);
+                    }
+
+                    // 결과 JSON에 추가
+                    resultJson.put(stockCode, prices);
+                    System.out.println(resultJson);
+
+                    int totalCount = body.getInt("totalCount"); // 전체 데이터 개수
+                    int totalPages = (int) Math.ceil((double) totalCount / numOfRows); // 전체 페이지 수 계산
+                    if (pageNo >= totalPages) {
+                        hasNextPage = false; // 모든 페이지를 가져왔으므로 반복 종료
+                    } else {
+                        pageNo++; // 다음 페이지로 이동
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("API 호출 중 오류 발생: " + e.getMessage());
+        }
+
+        System.out.println(json);
+        return json;
     }
 }

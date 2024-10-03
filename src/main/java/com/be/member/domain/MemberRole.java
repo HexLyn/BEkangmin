@@ -11,15 +11,16 @@ import lombok.ToString;
 @NoArgsConstructor
 public class MemberRole {
 
-    private int memberId;
+    private Long id;
 
-    private Member member;
+    private Long memberID;
 
     private String role;
 
+
     @Builder
-    public MemberRole(Member member, Role role) {
-        this.member = member;
+    public MemberRole(Long memberID, Role role) {
+        this.memberID = memberID;
         this.role = role.name();
     }
 }

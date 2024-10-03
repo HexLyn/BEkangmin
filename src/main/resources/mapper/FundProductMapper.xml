@@ -24,4 +24,11 @@
         FROM FundProduct
         WHERE product_nm LIKE #{keyword}
     </select>
+
+    <!-- 특정 채권 상품 상세 정보 조회 -->
+    <select id="getFundProductDetail" resultType="com.be.finance.domain.FundProductVO">
+        SELECT *
+        FROM FundProduct
+        WHERE productId = #{productId}
+    </select>
 </mapper>

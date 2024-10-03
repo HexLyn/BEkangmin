@@ -15,4 +15,7 @@ public interface BondProductMapper {
 
     // 채권 검색 리스트 조회
     List<BondProductVO> searchBondProducts(@Param("keyword") String keyword);
+
+    // 특정 채권 상품 상세 정보 조회
+    BondProductVO getBondProductDetail(int productId);
 }

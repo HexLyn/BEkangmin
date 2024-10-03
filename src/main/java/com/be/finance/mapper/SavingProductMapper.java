@@ -27,17 +27,28 @@ public interface SavingProductMapper {
     List<SavingProductVO> getSavingProducts();
 
     // 적금 기간별 수익률 리스트 조회
-    List<SavingProductRatesVO> getSavingRates();
+    List<SavingProductRatesVO> getSavingRates(List<SavingProductVO> productList);
 
     // 예금 상품 검색 리스트 조회
     List<SavingProductVO> searchDepositProducts(@Param("keyword") String keyword);
 
     // 검색된 예금 상품 기간별 수익률 조회
-    List<SavingProductRatesVO> searchDepositRatesProducts(@Param("keyword") String keyword);
+    List<SavingProductRatesVO> searchDepositRatesProducts(List<SavingProductVO> productList);
 
     // 적금 상품 검색 리스트 조회
     List<SavingProductVO> searchSavingProducts(@Param("keyword") String keyword);
 
     // 검색된 적금 상품 기간별 수익률 조회
-    List<SavingProductRatesVO> searchSavingRatesProducts(@Param("keyword") String keyword);
+    List<SavingProductRatesVO> searchSavingRatesProducts(List<SavingProductVO> productList);
+
+    // 페이징된 예금 상품에 대한 기간별 수익률 조회
+    List<SavingProductRatesVO> getDepositRatesByProductIds(@Param("productIds") List<Integer> productIds);
+
+
+    // 페이징된 적금 상품에 대한 기간별 수익률 조회
+    List<SavingProductRatesVO> getSavingRatesByProductIds(@Param("productIds") List<Integer> productIds);
+
+    List<SavingProductRatesVO> searchDepositRatesByProductIds(@Param("productIds") List<Integer> productIds);
+
+    List<SavingProductRatesVO> searchSavingRatesByProductIds(@Param("productIds") List<Integer> productIds);
 }

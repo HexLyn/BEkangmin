@@ -13,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MemberLoginReqDto {
-
     private String memberID;
     private String password;
-
 }

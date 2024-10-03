@@ -16,46 +16,31 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class PortfolioReqDto {
-    private Integer portfolioId;
-    private Date creationDate;
+    private String portfolioName;
     private int total;
     private int expectedReturn;
     private int riskLevel;
-    private String portfolioName;
-    private int userNum;
+    private int memberNum;
 
-    private List<PortfolioItemReqDto> portfolioItems = new ArrayList<>();
-
-    public PortfolioReqDto of(PortfolioVO vo) {
-        return vo == null ? null : PortfolioReqDto.builder()
-                .creationDate(vo.getCreationDate())
-                .total(vo.getTotal())
-                .expectedReturn(vo.getExpectedReturn())
-                .riskLevel(vo.getRiskLevel())
-                .portfolioName(vo.getPortfolioName())
-                .userNum(vo.getUserNum())
-                .build();
-    }
+    private List<PortfolioItemReqDto> portfolioItems;
 
     public static PortfolioReqDto of(PortfolioResDto resDto) {
         return resDto == null ? null : PortfolioReqDto.builder()
-                .creationDate(resDto.getCreationDate())
                 .total(resDto.getTotal())
                 .expectedReturn(resDto.getExpectedReturn())
                 .riskLevel(resDto.getRiskLevel())
                 .portfolioName(resDto.getPortfolioName())
-                .userNum(resDto.getUserNum())
+                .memberNum(resDto.getMemberNum())
                 .build();
     }
 
     public PortfolioVO toVo() {
         return PortfolioVO.builder()
-                .creationDate(creationDate)
                 .total(total)
                 .expectedReturn(expectedReturn)
                 .riskLevel(riskLevel)
                 .portfolioName(portfolioName)
-                .userNum(userNum)
+                .memberNum(memberNum)
                 .build();
     }
 }

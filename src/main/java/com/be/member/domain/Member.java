@@ -1,6 +1,8 @@
 package com.be.member.domain;
 
 import lombok.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class Member implements UserDetails {
 
+    private static final Logger log = LoggerFactory.getLogger(Member.class);
     private long memberNum;
     private String memberID;
     private String memberName;
@@ -28,6 +31,16 @@ public class Member implements UserDetails {
     private String regDate;
 
     private List<MemberRole> memberRoles = new ArrayList<>();
+
+    public void addMemberRole(List<MemberRole> memberRoles) {
+        log.info("addMemberRole");
+        this.memberRoles = memberRoles;
+        log.info(memberRoles.toString());
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -44,6 +57,7 @@ public class Member implements UserDetails {
 
         return roles;
     }
+
 
     @Override
     public String getPassword() {
